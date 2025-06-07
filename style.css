@@ -52,7 +52,6 @@ main {
   width: 220px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
-  touch-action: none;
 }
 
 .card:hover {
@@ -67,6 +66,7 @@ main {
 .card canvas {
   border: 1px solid #ccc;
   border-radius: 10px;
+  touch-action: none; /* يمنع التكبير والتحريك باللمس */
 }
 
 .card p {
@@ -117,9 +117,3 @@ footer {
 .download-btn:hover {
   background-color: #e84343;
 }
-canvas {
-  touch-action: none;
-}
-
-
-

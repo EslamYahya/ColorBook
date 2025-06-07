@@ -35,7 +35,7 @@ animals.forEach(animal => {
   const clearBtn = card.querySelector(".clear-btn");
 
   const img = new Image();
-  img.src = \`images/\${animal.name}.png\`;
+  img.src = `images/${animal.name}.png`;
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
@@ -78,7 +78,7 @@ animals.forEach(animal => {
   canvas.addEventListener("mouseup", endPosition);
   canvas.addEventListener("mouseleave", endPosition);
 
-  // Touch events with prevention
+  // Touch events with prevention of default scrolling and zooming
   canvas.addEventListener("touchstart", e => {
     e.preventDefault();
     e.stopPropagation();

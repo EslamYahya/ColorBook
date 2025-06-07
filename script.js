@@ -18,7 +18,7 @@ animals.forEach(animal => {
   card.className = "card";
   card.innerHTML = `
     <h2>${animal.letter}</h2>
-    <canvas width="180" height="180" data-src="images/${animal.name}.png"></canvas>
+    <canvas width="180" height="180"></canvas>
     <p>${animal.name}</p>
     <div class="tools">
       <label>🎨 اللون: <input type="color" class="color-picker" value="#000000"></label>
@@ -27,57 +27,84 @@ animals.forEach(animal => {
     <button class="clear-btn">مسح</button>
   `;
   container.appendChild(card);
-});
 
-const setupCanvas = (canvas) => {
+  const canvas = card.querySelector("canvas");
   const ctx = canvas.getContext("2d");
-  let drawing = false;
-  let color = "#000";
-  let size = 3;
+  const colorPicker = card.querySelector(".color-picker");
+  const brushSize = card.querySelector(".brush-size");
+  const clearBtn = card.querySelector(".clear-btn");
 
+  
   const img = new Image();
-  img.src = canvas.dataset.src;
-  img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-  const updateSettings = (el) => {
-    const parent = el.closest(".card");
-    if (!parent) return;
-    color = parent.querySelector(".color-picker")?.value || "#000";
-    size = parseInt(parent.querySelector(".brush-size")?.value || 3);
+  img.src = `images/${animal.name}.png`;
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
 
-  canvas.addEventListener("mousedown", (e) => {
-    updateSettings(e.target);
-    drawing = true;
-    canvas.classList.add("drawing");
-  });
-  canvas.addEventListener("mouseup", () => {
-    drawing = false;
-    canvas.classList.remove("drawing");
-  });
-  canvas.addEventListener("mouseleave", () => {
-    drawing = false;
-    canvas.classList.remove("drawing");
-  });
+  let painting = false;
 
-  canvas.addEventListener("mousemove", (e) => {
-    if (!drawing) return;
-    const rect = canvas.getBoundingClientRect();
-    ctx.fillStyle = color;
+  function startPosition(x, y) {
+    painting = true;
+    draw(x, y);
+  }
+
+  function endPosition() {
+    painting = false;
     ctx.beginPath();
-    ctx.arc(e.clientX - rect.left, e.clientY - rect.top, size, 0, 2 * Math.PI);
-    ctx.fill();
+  }
+
+  function draw(x, y) {
+    if (!painting) return;
+    ctx.lineWidth = brushSize.value;
+    ctx.strokeStyle = colorPicker.value;
+    ctx.lineCap = "round";
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  }
+
+  
+  canvas.addEventListener("mousedown", e => {
+    const rect = canvas.getBoundingClientRect();
+    startPosition(e.clientX - rect.left, e.clientY - rect.top);
   });
 
-  const clearBtn = canvas.parentElement.querySelector(".clear-btn");
+  canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    draw(e.clientX - rect.left, e.clientY - rect.top);
+  });
+
+  canvas.addEventListener("mouseup", endPosition);
+  canvas.addEventListener("mouseleave", endPosition);
+
+  
+  canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    startPosition(touch.clientX - rect.left, touch.clientY - rect.top);
+  });
+
+  canvas.addEventListener("touchmove", e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    draw(touch.clientX - rect.left, touch.clientY - rect.top);
+  });
+
+  canvas.addEventListener("touchend", endPosition);
+
+  
   clearBtn.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   });
-};
+});
 
-document.querySelectorAll("canvas").forEach(setupCanvas);
 
-document.getElementById("toggle-theme").addEventListener("click", () => {
+const toggleThemeBtn = document.getElementById("toggle-theme");
+toggleThemeBtn.addEventListener("click", () => {
   document.body.classList.toggle("dark");
 });

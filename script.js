@@ -34,9 +34,8 @@ animals.forEach(animal => {
   const brushSize = card.querySelector(".brush-size");
   const clearBtn = card.querySelector(".clear-btn");
 
-  
   const img = new Image();
-  img.src = `images/${animal.name}.png`;
+  img.src = \`images/\${animal.name}.png\`;
   img.onload = () => {
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
@@ -65,7 +64,7 @@ animals.forEach(animal => {
     ctx.moveTo(x, y);
   }
 
-  
+  // Mouse events
   canvas.addEventListener("mousedown", e => {
     const rect = canvas.getBoundingClientRect();
     startPosition(e.clientX - rect.left, e.clientY - rect.top);
@@ -79,30 +78,33 @@ animals.forEach(animal => {
   canvas.addEventListener("mouseup", endPosition);
   canvas.addEventListener("mouseleave", endPosition);
 
-  
+  // Touch events with prevention
   canvas.addEventListener("touchstart", e => {
     e.preventDefault();
+    e.stopPropagation();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
     startPosition(touch.clientX - rect.left, touch.clientY - rect.top);
-  });
+  }, { passive: false });
 
   canvas.addEventListener("touchmove", e => {
     e.preventDefault();
+    e.stopPropagation();
     const rect = canvas.getBoundingClientRect();
     const touch = e.touches[0];
     draw(touch.clientX - rect.left, touch.clientY - rect.top);
-  });
+  }, { passive: false });
 
-  canvas.addEventListener("touchend", endPosition);
+  canvas.addEventListener("touchend", e => {
+    e.preventDefault();
+    endPosition();
+  }, { passive: false });
 
-  
   clearBtn.addEventListener("click", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   });
 });
-
 
 const toggleThemeBtn = document.getElementById("toggle-theme");
 toggleThemeBtn.addEventListener("click", () => {

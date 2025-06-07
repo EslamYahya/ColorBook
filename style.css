@@ -116,3 +116,9 @@ footer {
 .download-btn:hover {
   background-color: #e84343;
 }
+canvas {
+  touch-action: none;
+}
+
+
+
